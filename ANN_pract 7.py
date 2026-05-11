@@ -1,61 +1,76 @@
-# ANN Practical 8
-# Hopfield Network to Store 4 Vectors
+# ANN Practical 7
+# XOR using Backpropagation
 
 import numpy as np
 
-# Stored vectors
-vectors = np.array([[1, 1, -1, -1],
-                    [-1, -1, 1, 1],
-                    [1, -1, 1, -1],
-                    [-1, 1, -1, 1]])
+# Sigmoid function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
-# Weight matrix
-W = np.zeros((4,4))
+# Derivative
+def derivative(x):
+    return x * (1 - x)
 
-# Calculate weights
-for i in range(4):
+# XOR data
+X = np.array([[0,0],
+              [0,1],
+              [1,0],
+              [1,1]])
 
-    for j in range(4):
+Y = np.array([[0],
+              [1],
+              [1],
+              [0]])
 
-        if i != j:
-            W[i][j] = np.sum(vectors[i] * vectors[j])
+# Random weights
+np.random.seed(1)
 
-# Activation function
-def sign(x):
-    return np.where(x >= 0, 1, -1)
+w1 = np.random.rand(2,2)
+w2 = np.random.rand(2,1)
 
-# Hopfield function
-def hopfield(x):
+# Training
+for i in range(5000):
 
-    y = np.dot(W, x)
+    # Forward propagation
+    hidden = sigmoid(np.dot(X, w1))
 
-    return sign(y)
+    output = sigmoid(np.dot(hidden, w2))
 
-# User Input
-# Example Input:
-# Enter 4 values: 1 1 -1 -1
+    # Error
+    error = Y - output
 
-x = np.array(list(map(int,
-        input("Enter 4 values separated by space: ").split())))
+    # Backpropagation
+    d_output = error * derivative(output)
+
+    d_hidden = d_output.dot(w2.T) * derivative(hidden)
+
+    # Update weights
+    w2 += hidden.T.dot(d_output) * 0.1
+    w1 += X.T.dot(d_hidden) * 0.1
 
 # Output
-output = hopfield(x)
+print("XOR Output:")
 
-print("Output Vector:")
-print(output)
+for i in range(len(X)):
+
+    hidden = sigmoid(np.dot(X[i], w1))
+
+    output = sigmoid(np.dot(hidden, w2))
+
+    print(X[i], "=", round(output[0][0]))
 
 
 
 # Viva Questions & Answers
 
-# Q1. What is Hopfield Network?
-# It is a recurrent neural network.
+# Q1. What is XOR?
+# Output is 1 when inputs are different.
 
-# Q2. Why self connection is avoided?
-# A neuron should not connect to itself.
+# Q2. What is backpropagation?
+# It updates weights using error.
 
-# Q3. What type of output is generated?
-# Bipolar output (+1 and -1).
+# Q3. Why sigmoid is used?
+# To get output between 0 and 1.
 
-# Q4. What is associative memory?
-# It recalls stored patterns.
+# Q4. Why hidden layer is used?
+# To solve non-linear problems.
