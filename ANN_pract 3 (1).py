@@ -1,103 +1,77 @@
-# Simple Perceptron for Even-Odd Recognition (ASCII digits)
+# ANN Practical 3
+# Perceptron Neural Network for Even and Odd Recognition
 
+import numpy as np
 
-# step activation function
+# Step activation function
 def step(x):
-
-    # return 1 if value >= 0 otherwise 0
     return 1 if x >= 0 else 0
 
-
-# create empty training data list
 training_data = []
 
+# Create training data for digits 0 to 9
+for i in range(10):
 
-# take number of training samples
-n = int(input("Enter number of training samples: "))
+    ascii_value = ord(str(i))   # Get ASCII value
+    binary = [int(bit) for bit in format(ascii_value, '07b')]  # Convert to binary
 
+    label = 1 if i % 2 == 0 else 0   # 1 = Even, 0 = Odd
 
-print("Enter ASCII value and target (0=Even, 1=Odd)")
+    training_data.append([binary, label])
 
+# Initialize weights
+weights = np.zeros(7)
 
-# input training data
-for i in range(n):
+# Train perceptron
+for data in training_data:
 
-    # take ASCII value
-    ascii_val = int(input("Enter ASCII value (48-57): "))
+    x = np.array(data[0])
+    y = data[1]
 
-    # take target output
-    target = int(input("Enter target (0 for Even, 1 for Odd): "))
+    output = step(np.dot(x, weights))
 
-    # feature extraction using modulo
-    x = ascii_val % 2
+    error = y - output
 
-    # store data
-    training_data.append((x, target))
+    weights = weights + x * error
 
+# User Input
+# Example Input:
+# Enter number: 6
 
-# initialize weight and bias
-w = 0.0
-b = 0.0
+num = input("Enter a digit (0-9): ")
 
-# learning rate
-learning_rate = 0.1
+# Check valid input
+if num.isdigit() and int(num) <= 9:
 
+    ascii_value = ord(num)
 
-# training perceptron model
-for epoch in range(10):
+    binary = np.array([int(bit) for bit in format(ascii_value, '07b')])
 
-    for x, target in training_data:
+    prediction = step(np.dot(binary, weights))
 
-        # calculate output
-        y = step(w * x + b)
+    if prediction == 1:
+        print(num, "is Even")
+    else:
+        print(num, "is Odd")
 
-        # calculate error
-        error = target - y
+else:
+    print("Invalid Input")
 
-        # update weight
-        w += learning_rate * error * x
-
-        # update bias
-        b += learning_rate * error
-
-
-# testing phase
-print("\nASCII  Digit  Result")
-
-
-for ascii_val in range(48, 58):
-
-    # extract feature
-    x = ascii_val % 2
-
-    # predict output
-    output = step(w * x + b)
-
-    # convert ASCII to digit
-    digit = chr(ascii_val)
-
-    # display result
-    result = "Odd" if output == 1 else "Even"
-
-    print(ascii_val, "   ", digit, "   ", result)
 
 
 # Viva Questions & Answers
 
-# Q1. What is perceptron?
-# Perceptron is a single-layer neural network.
+# Q1. What is Perceptron?
+# Perceptron is a single layer neural network.
 
-# Q2. Why ASCII values are used?
-# To represent digits numerically.
+# Q2. Why step function is used?
+# To give binary output 0 or 1.
 
-# Q3. Why modulo (%) is used?
-# To identify even and odd numbers.
+# Q3. What is ASCII?
+# ASCII is a character encoding system.
 
-# Q4. What is learning rate?
-# It controls speed of learning.
+# Q4. Why binary conversion is used?
+# Neural networks work on numerical data.
 
-# Q5. What is step activation function?
-# It converts output into binary form 0 or 1.
-
-# Q6. What is bias?
-# Bias helps shift decision boundary.
+# Q5. What is perceptron learning rule?
+# It updates weights using error value.
