@@ -1,91 +1,61 @@
-# ANN Practical 7
-# Backpropagation Network for XOR Function
+# ANN Practical 8
+# Hopfield Network to Store 4 Vectors
 
 import numpy as np
 
-# Sigmoid function
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+# Stored vectors
+vectors = np.array([[1, 1, -1, -1],
+                    [-1, -1, 1, 1],
+                    [1, -1, 1, -1],
+                    [-1, 1, -1, 1]])
 
-# Derivative of sigmoid
-def derivative(x):
-    return x * (1 - x)
+# Weight matrix
+W = np.zeros((4,4))
 
-# XOR Input
-X = np.array([[0,0],
-              [0,1],
-              [1,0],
-              [1,1]])
+# Calculate weights
+for i in range(4):
 
-# XOR Output
-Y = np.array([[0],
-              [1],
-              [1],
-              [0]])
+    for j in range(4):
 
-# Random weights and bias
-np.random.seed(1)
+        if i != j:
+            W[i][j] = np.sum(vectors[i] * vectors[j])
 
-W1 = np.random.rand(2,4)
-W2 = np.random.rand(4,1)
+# Activation function
+def sign(x):
+    return np.where(x >= 0, 1, -1)
 
-b1 = np.random.rand(1,4)
-b2 = np.random.rand(1,1)
+# Hopfield function
+def hopfield(x):
 
-# Training
-epochs = 10000
-lr = 0.1
+    y = np.dot(W, x)
 
-for i in range(epochs):
+    return sign(y)
 
-    # Forward propagation
-    hidden = sigmoid(np.dot(X, W1) + b1)
+# User Input
+# Example Input:
+# Enter 4 values: 1 1 -1 -1
 
-    output = sigmoid(np.dot(hidden, W2) + b2)
+x = np.array(list(map(int,
+        input("Enter 4 values separated by space: ").split())))
 
-    # Error
-    error = Y - output
+# Output
+output = hopfield(x)
 
-    # Backpropagation
-    d_output = error * derivative(output)
-
-    hidden_error = d_output.dot(W2.T)
-
-    d_hidden = hidden_error * derivative(hidden)
-
-    # Update weights and bias
-    W2 += hidden.T.dot(d_output) * lr
-    W1 += X.T.dot(d_hidden) * lr
-
-    b2 += np.sum(d_output, axis=0) * lr
-    b1 += np.sum(d_hidden, axis=0) * lr
-
-# Final Output
-print("XOR Output:")
-
-for i in range(len(X)):
-
-    hidden = sigmoid(np.dot(X[i], W1) + b1)
-
-    output = sigmoid(np.dot(hidden, W2) + b2)
-
-    print(X[i], "=", round(output[0][0]))
+print("Output Vector:")
+print(output)
 
 
 
 # Viva Questions & Answers
 
-# Q1. What is XOR function?
-# XOR gives 1 when inputs are different.
+# Q1. What is Hopfield Network?
+# It is a recurrent neural network.
 
-# Q2. Why perceptron cannot solve XOR?
-# Because XOR is non-linear.
+# Q2. Why self connection is avoided?
+# A neuron should not connect to itself.
 
-# Q3. Why hidden layer is used?
-# To solve complex problems.
+# Q3. What type of output is generated?
+# Bipolar output (+1 and -1).
 
-# Q4. What is backpropagation?
-# It updates weights using error.
-
-# Q5. Why sigmoid is used?
-# To get output between 0 and 1.
+# Q4. What is associative memory?
+# It recalls stored patterns.
