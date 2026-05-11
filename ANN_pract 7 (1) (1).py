@@ -1,149 +1,91 @@
+# ANN Practical 7
+# Backpropagation Network for XOR Function
+
 import numpy as np
 
-# Define the parameters of the network
-input_neuron = 2    # Number of input neurons
-hidden_neuron = 4   # Number of hidden neurons
-output_neuron = 1   # Number of output neurons
-learning_rate = 0.1
-epochs = 10000
-
-# Define the training data
-X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-Y = np.array([[0], [1], [1], [0]])
-
-# Initialize the weights with random values
-W1 = np.random.randn(input_neuron, hidden_neuron) * 0.01
-W2 = np.random.randn(hidden_neuron, output_neuron) * 0.01
-
-# Initialize the biases with random values
-b1 = np.random.randn(1, hidden_neuron) * 0.01
-b2 = np.random.randn(1, output_neuron) * 0.01
-
-# Define the sigmoid activation function and its derivative
+# Sigmoid function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-def sigmoid_derivative(x):
+# Derivative of sigmoid
+def derivative(x):
     return x * (1 - x)
 
-# Train the network using backpropagation
+# XOR Input
+X = np.array([[0,0],
+              [0,1],
+              [1,0],
+              [1,1]])
+
+# XOR Output
+Y = np.array([[0],
+              [1],
+              [1],
+              [0]])
+
+# Random weights and bias
+np.random.seed(1)
+
+W1 = np.random.rand(2,4)
+W2 = np.random.rand(4,1)
+
+b1 = np.random.rand(1,4)
+b2 = np.random.rand(1,1)
+
+# Training
+epochs = 10000
+lr = 0.1
+
 for i in range(epochs):
-    # Forward pass
-    hidden_layer_input = np.dot(X, W1) + b1
-    hidden_layer_output = sigmoid(hidden_layer_input)
-    output_layer_input = np.dot(hidden_layer_output, W2) + b2
-    output_layer_output = sigmoid(output_layer_input)
 
-    # Backward pass
-    output_error = Y - output_layer_output
-    output_delta = output_error * sigmoid_derivative(output_layer_output)
+    # Forward propagation
+    hidden = sigmoid(np.dot(X, W1) + b1)
 
-    hidden_error = output_delta.dot(W2.T)
-    hidden_delta = hidden_error * sigmoid_derivative(hidden_layer_output)
+    output = sigmoid(np.dot(hidden, W2) + b2)
 
-    # Update weights and biases
-    W2 += np.dot(hidden_layer_output.T, output_delta) * learning_rate
-    b2 += np.sum(output_delta, axis=0, keepdims=True) * learning_rate
-    W1 += np.dot(X.T, hidden_delta) * learning_rate
-    b1 += np.sum(hidden_delta, axis=0, keepdims=True) * learning_rate
+    # Error
+    error = Y - output
 
-# Test the network with some example inputs
-x_test = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_test = np.array([[0], [1], [1], [0]])
+    # Backpropagation
+    d_output = error * derivative(output)
 
-hidden_layer_input = np.dot(x_test, W1) + b1
-hidden_layer_output = sigmoid(hidden_layer_input)
-output_layer_input = np.dot(hidden_layer_output, W2) + b2
-output_layer_output = sigmoid(output_layer_input)
+    hidden_error = d_output.dot(W2.T)
 
-print("Input:")
-print(x_test)
-print("Output:")
-print(output_layer_output)
-print("Expected Output:")
-print(y_test)
+    d_hidden = hidden_error * derivative(hidden)
 
+    # Update weights and bias
+    W2 += hidden.T.dot(d_output) * lr
+    W1 += X.T.dot(d_hidden) * lr
 
-# -------------------------------------------------
-# for viva
-# # import numpy library
-# import numpy as np
+    b2 += np.sum(d_output, axis=0) * lr
+    b1 += np.sum(d_hidden, axis=0) * lr
+
+# Final Output
+print("XOR Output:")
+
+for i in range(len(X)):
+
+    hidden = sigmoid(np.dot(X[i], W1) + b1)
+
+    output = sigmoid(np.dot(hidden, W2) + b2)
+
+    print(X[i], "=", round(output[0][0]))
 
 
-# # define network parameters
-# input_neuron = 2
-# hidden_neuron = 4
-# output_neuron = 1
 
-# learning_rate = 0.1
-# epochs = 10000
+# Viva Questions & Answers
 
+# Q1. What is XOR function?
+# XOR gives 1 when inputs are different.
 
-# # XOR input and output
-# X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-# Y = np.array([[0], [1], [1], [0]])
+# Q2. Why perceptron cannot solve XOR?
+# Because XOR is non-linear.
 
+# Q3. Why hidden layer is used?
+# To solve complex problems.
 
-# # initialize random weights and biases
-# W1 = np.random.randn(input_neuron, hidden_neuron) * 0.01
-# W2 = np.random.randn(hidden_neuron, output_neuron) * 0.01
+# Q4. What is backpropagation?
+# It updates weights using error.
 
-# b1 = np.random.randn(1, hidden_neuron) * 0.01
-# b2 = np.random.randn(1, output_neuron) * 0.01
-
-
-# # sigmoid activation function
-# def sigmoid(x):
-#     return 1 / (1 + np.exp(-x))
-
-
-# # derivative of sigmoid
-# def sigmoid_derivative(x):
-#     return x * (1 - x)
-
-
-# # training loop
-# for i in range(epochs):
-
-#     # forward pass
-#     hidden_layer_input = np.dot(X, W1) + b1
-#     hidden_layer_output = sigmoid(hidden_layer_input)
-
-#     output_layer_input = np.dot(hidden_layer_output, W2) + b2
-#     output_layer_output = sigmoid(output_layer_input)
-
-#     # calculate error
-#     output_error = Y - output_layer_output
-
-#     # backpropagation
-#     output_delta = output_error * sigmoid_derivative(output_layer_output)
-
-#     hidden_error = output_delta.dot(W2.T)
-#     hidden_delta = hidden_error * sigmoid_derivative(hidden_layer_output)
-
-#     # update weights and biases
-#     W2 += np.dot(hidden_layer_output.T, output_delta) * learning_rate
-#     b2 += np.sum(output_delta, axis=0, keepdims=True) * learning_rate
-
-#     W1 += np.dot(X.T, hidden_delta) * learning_rate
-#     b1 += np.sum(hidden_delta, axis=0, keepdims=True) * learning_rate
-
-
-# # test output
-# print("Output:")
-# print(output_layer_output)
-
-
-# # Viva Questions & Answers
-
-# # Q1. What is XOR problem?
-# # XOR gives output 1 when inputs are different.
-
-# # Q2. Why perceptron cannot solve XOR?
-# # Because XOR is non-linearly separable.
-
-# # Q3. Why hidden layer is used?
-# # To solve complex non-linear problems.
-
-# # Q4. What is backpropagation?
-# # Method to reduce error by updating weights.
+# Q5. Why sigmoid is used?
+# To get output between 0 and 1.
